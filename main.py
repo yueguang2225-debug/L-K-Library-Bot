@@ -1,6 +1,7 @@
 import os
 import logging
 import threading
+import requests
 from flask import Flask
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -160,15 +161,21 @@ async def del_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_name = " ".join(context.args).strip().lower()
     if file_name in pdf_database:
         del pdf_database[file_name]
-        await update.message.reply_text(f"🗑️ `{file_name}` ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။", parse_mode="Markdown")
+        await update.message.reply_text(🗑️ `{file_name}` ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။", parse_mode="Markdown")
     else:
         await update.message.reply_text("❌ အဆိုပါ ဖိုင်အမည်ကို မတွေ့ရှိပါ။")
 
 def main():
+    # Webhook ဖျက်ခြင်းကို Error မတက်အောင် try-except ဖြင့် ထည့်သွင်းခြင်း
+    try:
+        requests.get(f"https://api.telegram.org/bot{TOKEN}/deleteWebhook", timeout=5)
+    except Exception as e:
+        logging.warning(f"Could not delete webhook: {e}")
+
     # Flask ဆာဗာကို Thread ဖြင့် စတင်ခြင်း
     threading.Thread(target=run_flask, daemon=True).start()
 
-    # Telegram Bot App (run_polling() ကို တိုက်ရိုက်သုံးခြင်းဖြင့် event loop ပြဿနာကို ဖြေရှင်းသည်)
+    # Telegram Bot App
     app_bot = ApplicationBuilder().token(TOKEN).build()
 
     app_bot.add_handler(CommandHandler("start", start_command))
