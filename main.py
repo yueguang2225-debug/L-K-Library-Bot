@@ -161,7 +161,7 @@ async def del_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_name = " ".join(context.args).strip().lower()
     if file_name in pdf_database:
         del pdf_database[file_name]
-        await update.message.reply_text(🗑️ `{file_name}` ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။", parse_mode="Markdown")
+        await update.message.reply_text(f"🗑️ `{file_name}` ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။", parse_mode="Markdown")
     else:
         await update.message.reply_text("❌ အဆိုပါ ဖိုင်အမည်ကို မတွေ့ရှိပါ။")
 
