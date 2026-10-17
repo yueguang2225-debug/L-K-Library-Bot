@@ -1,7 +1,6 @@
 import os
 import logging
 import threading
-import requests
 from flask import Flask
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -166,12 +165,6 @@ async def del_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ အဆိုပါ ဖိုင်အမည်ကို မတွေ့ရှိပါ။")
 
 def main():
-    # Webhook ဖျက်ခြင်းကို Error မတက်အောင် try-except ဖြင့် ထည့်သွင်းခြင်း
-    try:
-        requests.get(f"https://api.telegram.org/bot{TOKEN}/deleteWebhook", timeout=5)
-    except Exception as e:
-        logging.warning(f"Could not delete webhook: {e}")
-
     # Flask ဆာဗာကို Thread ဖြင့် စတင်ခြင်း
     threading.Thread(target=run_flask, daemon=True).start()
 
