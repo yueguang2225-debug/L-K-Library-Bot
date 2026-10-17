@@ -17,12 +17,12 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# ထည့်သွင်းပေးထားသော အချက်အလက်များ
-TOKEN = os.environ.get("BOT_TOKEN", "8782021971:AAFCVu4aUkJ-ZAI3wNY1e01iXlOm2cWFteA")
-ADMIN_ID = int(os.environ.get("ADMIN_ID", "8012437507"))
-MUST_JOIN_CHANNEL = os.environ.get("CHANNEL_USERNAME", "@collectionroom305")
+# အချက်အလက်များ
+TOKEN = "8782021971:AAFCVu4aUkJ-ZAI3wNY1e01iXlOm2cWFteA"
+ADMIN_ID = 8012437507
+MUST_JOIN_CHANNEL = "@collectionroom305"
 
-# Flask Web Server (Render Port Timeout မဖြစ်စေရန်)
+# Flask Web Server
 app = Flask(__name__)
 
 @app.route('/')
@@ -34,7 +34,6 @@ def run_flask():
     app.run(host='0.0.0.0', port=port)
 
 # Memory ထဲတွင် PDF ဖိုင်များ သိမ်းဆည်းရန် Data Structure
-# Key: pdf_name (lowercase), Value: telegram_file_id
 pdf_database = {}
 
 # Channel Join ထားခြင်း ရှိ/မရှိ စစ်ဆေးသည့် Function
@@ -46,7 +45,6 @@ async def is_user_joined(context: ContextTypes.DEFAULT_TYPE, user_id: int) -> bo
         return False
     except Exception as e:
         logging.error(f"Error checking channel membership: {e}")
-        # Bot သည် Channel တွင် Admin မဟုတ်ပါက သို့မဟုတ် Error တက်ပါက သုံးစွဲသူကို ဝင်ရောက်ခွင့်ပြုမည်
         return True
 
 # /start command
@@ -131,7 +129,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             file_id = pdf_database[query]
             await update.message.reply_document(document=file_id, caption=f"📄 {query}.pdf")
         else:
-            # တူညီနိုင်သော ဖိုင်များကို ရှာဖွေပေးခြင်း
             matches = [k for k in pdf_database.keys() if query in k]
             if matches:
                 text = "🔎 သင်ရှာဖွေသော အမည်နှင့် ဆင်တူသည့် ဖိုင်များ:\n\n"
@@ -171,7 +168,7 @@ def main():
     # Flask ဆာဗာကို Thread ဖြင့် စတင်ခြင်း
     threading.Thread(target=run_flask, daemon=True).start()
 
-    # Telegram Bot App
+    # Telegram Bot App (run_polling() ကို တိုက်ရိုက်သုံးခြင်းဖြင့် event loop ပြဿနာကို ဖြေရှင်းသည်)
     app_bot = ApplicationBuilder().token(TOKEN).build()
 
     app_bot.add_handler(CommandHandler("start", start_command))
